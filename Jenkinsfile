@@ -31,7 +31,7 @@ pipeline {
                 docker run -d \
                 --name ${CONTAINER_NAME} \
                 --restart unless-stopped \
-                -p 8080:80 \
+                -p 8090:80 \
                 ${IMAGE_NAME}:latest
                 '''
             }
