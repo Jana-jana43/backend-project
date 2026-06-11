@@ -1,12 +1,38 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "winngoo-group"
+        CONTAINER_NAME = "winngoo-group"
+    }
+
     stages {
-        stage('Deploy') {
+
+        stage('Build Docker Image') {
             steps {
                 sh '''
-                rm -rf /var/www/winngoogroup/public/*
-                cp -r * /var/www/winngoogroup/public/
+                docker build -t ${IMAGE_NAME}:latest .
+                '''
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                sh '''
+                docker stop ${CONTAINER_NAME} || true
+                docker rm ${CONTAINER_NAME} || true
+                '''
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                sh '''
+                docker run -d \
+                --name ${CONTAINER_NAME} \
+                --restart unless-stopped \
+                -p 8080:80 \
+                ${IMAGE_NAME}:latest
                 '''
             }
         }
